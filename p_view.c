@@ -1,3 +1,22 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 
 #include "g_local.h"
 #include "m_player.h"
@@ -200,24 +219,24 @@ Auto pitching on slopes?
 
 ===============
 */
-void SV_CalcViewOffset (edict_t *ent)
+void SV_CalcViewOffset(edict_t* ent)
 {
-	float		*angles;
+	float* angles;
 	float		bob;
 	float		ratio;
 	float		delta;
 	vec3_t		v;
 
 
-//===================================
+	//===================================
 
-	// base angles
+		// base angles
 	angles = ent->client->ps.kick_angles;
 
 	// if dead, fix the angle and don't add any kick
 	if (ent->deadflag)
 	{
-		VectorClear (angles);
+		VectorClear(angles);
 
 		ent->client->ps.viewangles[ROLL] = 40;
 		ent->client->ps.viewangles[PITCH] = -15;
@@ -227,7 +246,7 @@ void SV_CalcViewOffset (edict_t *ent)
 	{
 		// add angles based on weapon kick
 
-		VectorCopy (ent->client->kick_angles, angles);
+		VectorCopy(ent->client->kick_angles, angles);
 
 		// add angles based on damage kick
 
@@ -250,11 +269,11 @@ void SV_CalcViewOffset (edict_t *ent)
 
 		// add angles based on velocity
 
-		delta = DotProduct (ent->velocity, forward);
-		angles[PITCH] += delta*run_pitch->value;
-		
-		delta = DotProduct (ent->velocity, right);
-		angles[ROLL] += delta*run_roll->value;
+		delta = DotProduct(ent->velocity, forward);
+		angles[PITCH] += delta * run_pitch->value;
+
+		delta = DotProduct(ent->velocity, right);
+		angles[ROLL] += delta * run_roll->value;
 
 		// add angles based on bob
 
@@ -270,11 +289,11 @@ void SV_CalcViewOffset (edict_t *ent)
 		angles[ROLL] += delta;
 	}
 
-//===================================
+	//===================================
 
-	// base origin
+		// base origin
 
-	VectorClear (v);
+	VectorClear(v);
 
 	// add view height
 
@@ -297,24 +316,28 @@ void SV_CalcViewOffset (edict_t *ent)
 
 	// add kick offset
 
-	VectorAdd (v, ent->client->kick_origin, v);
+	VectorAdd(v, ent->client->kick_origin, v);
 
 	// absolutely bound offsets
 	// so the view can never be outside the player box
-
-	if (v[0] < -14)
-		v[0] = -14;
-	else if (v[0] > 14)
-		v[0] = 14;
-	if (v[1] < -14)
-		v[1] = -14;
-	else if (v[1] > 14)
-		v[1] = 14;
-	if (v[2] < -22)
-		v[2] = -22;
-	else if (v[2] > 30)
-		v[2] = 30;
-
+		if (v[0] < -14)
+			v[0] = -14;
+		else if (v[0] > 14)
+			v[0] = 14;
+		if (v[1] < -14)
+			v[1] = -14;
+		else if (v[1] > 14)
+			v[1] = 14;
+		if (v[2] < -22)
+			v[2] = -22;
+		else if (v[2] > 30)
+			v[2] = 30;
+	/*
+	VectorSet(v, 0, 0, 0);
+	ent->client->ps.pmove.origin[0] = ent->client->cam->s.origin[0] * 8;
+	ent->client->ps.pmove.origin[1] = ent->client->cam->s.origin[1] * 8;
+	ent->client->ps.pmove.origin[2] = ent->client->cam->s.origin[2] * 8;
+	*/
 	VectorCopy (v, ent->client->ps.viewoffset);
 }
 
@@ -1022,7 +1045,7 @@ void ClientEndServerFrame (edict_t *ent)
 
 	// apply all the damage taken this frame
 	P_DamageFeedback (ent);
-
+	
 	// determine the view offsets
 	SV_CalcViewOffset (ent);
 

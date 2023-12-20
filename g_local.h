@@ -1,3 +1,22 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
@@ -503,7 +522,6 @@ extern	cvar_t	*fraglimit;
 extern	cvar_t	*timelimit;
 extern	cvar_t	*password;
 extern	cvar_t	*spectator_password;
-extern	cvar_t	*needpass;
 extern	cvar_t	*g_select_empty;
 extern	cvar_t	*dedicated;
 
@@ -824,7 +842,7 @@ typedef struct
 	int			savedFlags;
 
 	int			selected_item;
-	int			inventory[MAX_ITEMS];
+	int			inventory[MAX_ITEMS]; 
 
 	// ammo capacities
 	int			max_bullets;
@@ -941,6 +959,8 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	edict_t		*cam;
 };
 
 
@@ -1091,5 +1111,8 @@ struct edict_s
 	// common data blocks
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
+
+	int			chasedist1;
+	int			chasedist2;
 };
 

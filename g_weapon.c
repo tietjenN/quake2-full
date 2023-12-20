@@ -1,3 +1,22 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 #include "g_local.h"
 
 
@@ -203,7 +222,8 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		{
 			if (tr.ent->takedamage)
 			{
-				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_BULLET, mod);
+				tr.ent->nextthink = level.time += 50;
+				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, 0, kick, DAMAGE_BULLET, mod); //damage to 0
 			}
 			else
 			{
@@ -586,12 +606,13 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	}
 
 	T_RadiusDamage(ent, ent->owner, ent->radius_dmg, other, ent->dmg_radius, MOD_R_SPLASH);
+	ThrowGib(ent, "models/objects/gibs/bone/tris.md2", 2, ent->s.origin);
 
 	gi.WriteByte (svc_temp_entity);
 	if (ent->waterlevel)
 		gi.WriteByte (TE_ROCKET_EXPLOSION_WATER);
 	else
-		gi.WriteByte (TE_ROCKET_EXPLOSION);
+		gi.WriteByte (TE_EXPLOSION1);
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
 
@@ -608,12 +629,12 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
 	rocket->movetype = MOVETYPE_FLYMISSILE;
-	rocket->clipmask = MASK_SHOT;
+	rocket->clipmask = MASK_MONSTERSOLID;
 	rocket->solid = SOLID_BBOX;
-	rocket->s.effects |= EF_ROCKET;
+	rocket->s.effects |= EF_COLOR_SHELL;
 	VectorClear (rocket->mins);
 	VectorClear (rocket->maxs);
-	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
+	rocket->s.modelindex = gi.modelindex ("models/deadbods/dude/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
 	rocket->nextthink = level.time + 8000/speed;
@@ -661,9 +682,7 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 		}
 		else
 		{
-			//ZOID--added so rail goes through SOLID_BBOX entities (gibs, etc)
-			if ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client) ||
-				(tr.ent->solid == SOLID_BBOX))
+			if ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client))
 				ignore = tr.ent;
 			else
 				ignore = NULL;
@@ -698,7 +717,7 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 
 /*
 =================
-fire_bfg
+fire_bfg -> flamethrower
 =================
 */
 void bfg_explode (edict_t *self)
@@ -897,3 +916,51 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 
 	gi.linkentity (bfg);
 }
+/*
+void swing_knife(edict_t* self, vec3_t start, vec3_t dir, int damage, int kick) {
+	trace_t		tr;
+	vec3_t		forward, right, up;
+	vec3_t		v;
+	vec3_t		point;
+	float		range;
+
+	//see if enemy is in range
+	VectorSubtract(self->enemy->s.origin, self->s.origin, dir);
+	range = VectorLength(dir);
+	if (range > MELEE_DISTANCE)
+		return false;
+
+	VectorMA(self->s.origin, range, dir, point);
+
+	tr = gi.trace(self->s.origin, NULL, NULL, point, self, MASK_SHOT);
+	if (tr.fraction < 1)
+	{
+		if (!tr.ent->takedamage)
+			return false;
+		// if it will hit any client/monster then hit the one we wanted to hit
+		if ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client))
+			tr.ent = self->enemy;
+	}
+
+	AngleVectors(self->s.angles, forward, right, up);
+	VectorMA(self->s.origin, range, forward, point);
+	VectorMA(point, 1, right, point);
+	VectorMA(point, 1, up, point);
+	VectorSubtract(point, self->enemy->s.origin, dir);
+
+	// do the damage
+	T_Damage(tr.ent, self, self, dir, point, vec3_origin, damage, kick / 2, DAMAGE_NO_KNOCKBACK, MOD_HIT);
+
+	if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
+		return false;
+
+	// do our special form of knockback here
+	VectorMA(self->enemy->absmin, 0.5, self->enemy->size, v);
+	VectorSubtract(v, point, v);
+	VectorNormalize(v);
+	VectorMA(self->enemy->velocity, kick, v, self->enemy->velocity);
+	if (self->enemy->velocity[2] > 0)
+		self->enemy->groundentity = NULL;
+	return true;
+}
+*/

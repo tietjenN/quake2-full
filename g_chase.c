@@ -1,4 +1,40 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 #include "g_local.h"
+
+void ThirdPersonCam(edict_t* ent) {
+	vec3_t cam_pos;
+	//ent->client->ps.gunindex = 0;
+	VectorCopy(ent->s.origin, cam_pos);
+	cam_pos[2] += 30;
+
+	edict_t* cam;
+	cam = G_Spawn();
+	cam->movetype = MOVETYPE_FLYMISSILE;
+	cam->solid = SOLID_NOT;
+	cam->owner = ent;
+	VectorCopy(ent->s.angles, cam->s.angles);
+	VectorClear(cam->mins);
+	VectorClear(cam->maxs);
+	VectorCopy(cam_pos, cam->s.origin);
+}
 
 void UpdateChaseCam(edict_t *ent)
 {
@@ -11,6 +47,7 @@ void UpdateChaseCam(edict_t *ent)
 	vec3_t angles;
 
 	// is our chase target gone?
+	/*
 	if (!ent->client->chase_target->inuse
 		|| ent->client->chase_target->client->resp.spectator) {
 		edict_t *old = ent->client->chase_target;
@@ -21,6 +58,7 @@ void UpdateChaseCam(edict_t *ent)
 			return;
 		}
 	}
+	*/
 
 	targ = ent->client->chase_target;
 

@@ -1,3 +1,22 @@
+/*
+Copyright (C) 1997-2001 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
 // g_weapon.c
 
 #include "g_local.h"
@@ -746,8 +765,8 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	int		radius_damage;
 
 	damage = 100 + (int)(random() * 20.0);
-	radius_damage = 120;
-	damage_radius = 120;
+	radius_damage = 500;
+	damage_radius = 500;
 	if (is_quad)
 	{
 		damage *= 4;
@@ -761,7 +780,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+	fire_rocket (ent, start, forward, damage, 900, damage_radius, radius_damage);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1367,7 +1386,7 @@ void weapon_bfg_fire (edict_t *ent)
 
 		ent->client->ps.gunframe++;
 
-		PlayerNoise(ent, start, PNOISE_WEAPON);
+		PlayerNoise(ent, ent->s.origin, PNOISE_WEAPON);
 		return;
 	}
 
@@ -1410,6 +1429,20 @@ void Weapon_BFG (edict_t *ent)
 
 	Weapon_Generic (ent, 8, 32, 55, 58, pause_frames, fire_frames, weapon_bfg_fire);
 }
+/*
+void weapon_knife_swing(edict_t* ent) {
+	vec3_t	start, dir;
+	vec3_t	forward, right;
+	int		damage;
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+	VectorScale(forward, -2, ent->client->kick_origin);
+	VectorSet(dir, MELEE_DISTANCE, ent->mins[0], 8);
+	swing_knife(ent, start, dir, 50, 10);
+}
 
+void Weapon_Knife(edict_t* ent) {
+	
+}
+*/
 
 //======================================================================
